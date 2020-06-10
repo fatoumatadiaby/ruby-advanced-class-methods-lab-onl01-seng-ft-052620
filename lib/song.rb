@@ -1,49 +1,65 @@
 class Song
-  # attr_reader abstracting the code so you dont have to write a "reader"  (getter) you could type all of this out below with methods, but this looks cleaner
-  attr_reader :name, :artist, :genre
-  # in this "instance" before "initialization" there arent any albums that exist
-  @@count = 0
-  # stores all artists
-  @@artists = []
-  # stores all genres
-  @@genres = []
-  #initialize the class here, define the "instance variables", set the counter to increase by 1 as an album is added. Add all genres to the @@genres array, add all artists to @@artists array
-  def initialize(name, artist, genre)
-    @name = name
-    @artist = artist
-    @genre = genre
-    @@count += 1
-    @@genres << genre
-    @@artists << artist
+  attr_accessor :name, :artist_name
+  @@all = []
+
+
+
+  def self.all
+    @@all
   end
-  #this makes the "class variable"(@@count) accessible through a method. Notice in the beginning that it is set to = 0 and it increments += 1. This just keeps track of how many songs are created. (self.count) is the class method which will return this number when called
-  def self.count
-    @@count
+
+  def save
+    self.class.all << self
   end
-  #this "class method" (self.artist)(class methods act on themselves (.self), calls the class variable( @@artists) which is an array that only wants to retain elements without duplicates "(.uniq)"
-  def self.artists
-    @@artists.uniq
+
+  def self.create
+  song = self.new
+  self.all << song
+  song 
+  end 
+
+  def self.new_by_name(string)
+    song = self.new
+    song.name = string
+    song
   end
-  # same as above except with genres
-  def self.genres
-    @@genres.uniq
+
+
+  def self.create_by_name(string)
+    song = self.new
+    song.name = string
+    @@all << song
+    song
   end
- # this class method (self.genre.count) iterates over the class variable (@@genres) and basically counts the number of songs in each genre. Set up an empty hash to collect the values, then .count the class variable to see how many of each song exists in there. then return the hash
-  def self.genre_count
-    genre_hash = {}
-    self.genres.each do |genre|
-      genre_hash[genre] = @@genres.count {|g| g == genre}
+  def self.find_by_name(string)
+    self.all.find {|names| names.name  == string}
+  end  
+
+   def self.find_or_create_by_name(string)
+     find_by_name(string) || create_by_name(string)
+  end
+
+
+   def self.alphabetical 
+     self.all.sort {|song1, song2| song1.name <=> song2.name}
+   end 
+
+   def self.new_from_filename(file_name)
+    song = self.new 
+    song.name = (file_name.split(" - ")[1].chomp(".mp3"))
+    song.artist_name = (file_name.split(" - ")[0])
+    song
     end
-    genre_hash
+
+  def self.create_from_filename(file_name)
+    @@all << self.new_from_filename(file_name)
   end
-  #same as above but does it with artists
-  def self.artist_count
-    artist_hash = {}
-    self.artists.each do |artist|
-      artist_hash[artist] = @@artists.count {|a| a == artist}
-    end
-    artist_hash
+
+  def self.destroy_all
+    @@all.clear
   end
+
+
 end
 
 
